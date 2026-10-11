@@ -31,6 +31,7 @@ void load_transactions(std::vector<Transaction>& transactions);
 void show_menu(std::vector<Transaction>& transactions);
 void list_transactions(std::vector<Transaction>& transactions);
 void delete_transaction(std::vector<Transaction>& transactions);
+void change_transaction(std::vector<Transaction>& transactions);
 
 
 
@@ -97,7 +98,7 @@ void show_menu(std::vector<Transaction>& transactions){
     int choise = 0;
 
     while(true){
-        std::cout << "=-_-=-_-=BANK TRANSACTION LIST=-_-=-_-=\n"<<"1. Create transaction\n"
+        std::cout << "\n=-_-=-_-=BANK TRANSACTION LIST=-_-=-_-=\n"<<"1. Create transaction\n"
         <<"2. Show transaction list\n"<<"3. Delete transation\n"<<"4. Change transaction\n"
         <<"5. Find transaction\n"<<"7. Show only income\n"<<"8. Show only spendings\n"
         <<"9. Save and Quit\n"<<"""=-_-=-_-=-_-=-_-=-_-=-_-=-_-=-_-=-_-=-_-=";
@@ -117,10 +118,10 @@ void show_menu(std::vector<Transaction>& transactions){
             list_transactions(transactions);
         }
         else if(choise == 3){
-            delete_transaction(transactions);
+            delete_transaction(transactions);           
         }
         else if(choise == 4){
-
+            change_transaction(transactions);
         }
         else if(choise == 5){
 
@@ -175,8 +176,7 @@ void delete_transaction(std::vector<Transaction>& transactions){
         std::cout << "Please enter which transaction you want to delete: ";
 
     do{
-        std::cin >> choise;
-        if(!std::cin >> choise || choise > transactions.size() || choise <= 0){
+        if(!(std::cin >> choise) || choise > transactions.size() || choise <= 0){
             std::cout << "Incorrect input!";
             std::cin.clear();std::cin.ignore(10000, '\n');
             std::cout << "\nPlease enter which transaction you want to delete: ";
@@ -189,4 +189,59 @@ void delete_transaction(std::vector<Transaction>& transactions){
         }
     }while(succes == false);
     }
+}
+
+void change_transaction(std::vector<Transaction>& transactions){
+    list_transactions(transactions);
+
+    Transaction block;
+    int choise = 0;
+    bool succes = false;
+    bool money_succes = false;
+    std::string date;
+    std::string description;
+    std::string type;
+    std::string category;
+    double money_amount = 0.0;
+
+    std::cout << "Please enter which transaction you want to change: ";
+    do{
+        std::cin >> choise;
+        if(!std::cin >> choise || choise > transactions.size() || choise <= 0){
+            std::cout << "Incorrect input";
+            std::cin.clear();std::cin.ignore(10000, '\n');
+            std::cout << "\nPlease enter which transaction you want to change: ";
+        }
+        else{
+            std::cin.clear();std::cin.ignore(10000, '\n');
+            std::cout << "Please enter new date of the transaction: ";
+            std::getline(std::cin, date);
+            std::cout << "Please enter new category of the transaction: ";
+            std::getline(std::cin, category);
+            std::cout << "Please enter new type of the transaction: ";
+            std::getline(std::cin, type);
+            do{
+                std::cout << "Please enter new amount of money: ";
+                if(!(std::cin >> money_amount)){
+                    std::cout << "Incorrect input! ";
+                    std::cin.clear(); std::cin.ignore(10000, '\n');                }
+                else{
+                    money_succes = true;
+                }
+            }while(money_succes == false);
+
+            std::cin.clear(); std::cin.ignore(10000, '\n');
+            std::cout << "Please enter new description of the transaction: ";
+            std::getline(std::cin, description);
+
+            transactions[choise - 1].category = category;
+            transactions[choise - 1].date = date;
+            transactions[choise - 1].type = type;
+            transactions[choise - 1].money_amount = money_amount;
+            transactions[choise - 1].description = description;
+            succes = true;
+            save_transactions(transactions);
+        }
+
+    }while(succes == false);
 }
