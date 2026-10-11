@@ -34,6 +34,7 @@ void list_transactions(std::vector<Transaction>& transactions);
 void delete_transaction(std::vector<Transaction>& transactions);
 void change_transaction(std::vector<Transaction>& transactions);
 std::string to_upper(std::string text);
+void find_transactions(std::vector<Transaction>& transactions);
 
 
 
@@ -107,7 +108,6 @@ void save_transactions(std::vector<Transaction>& transactions){
 //Function to show the main menu of the program
 void show_menu(std::vector<Transaction>& transactions){
     int choise = 0;
-
     while(true){
         std::cout << "\n=-_-=-_-=BANK TRANSACTION LIST=-_-=-_-=\n"<<"1. Create transaction\n"
         <<"2. Show transaction list\n"<<"3. Delete transation\n"<<"4. Change transaction\n"
@@ -135,7 +135,7 @@ void show_menu(std::vector<Transaction>& transactions){
             change_transaction(transactions);
         }
         else if(choise == 5){
-
+            find_transactions(transactions);
         }
         else if(choise == 6){
 
@@ -285,4 +285,56 @@ std::string to_upper(std::string text){
         });
 
     return text;
+}
+
+void find_transactions(std::vector<Transaction>& transactions){
+    std::string finding_word;
+    std::string spam;
+
+    if(transactions.empty()){
+        std::cout << "There is nothing to find from :(";
+    }
+    else{
+        std::cin.clear();std::cin.ignore(10000, '\n');
+        std::cout << "Please enter which transactions you want to find: ";
+        std::getline(std::cin, finding_word);
+        finding_word = to_upper(finding_word);
+        for (const auto& block : transactions){
+        if(to_upper(block.description).find(finding_word) != std::string::npos){
+            if(block.type == "spend"){
+                std::cout << block.date << "|\t  "<< block.category
+                <<"|\t  \033[31m"<<to_upper(block.type)<<"\033[0m|\t  "<< block.money_amount << "|\t  " << block.description<<"|\n"; 
+            }
+            else{
+                std::cout << block.date << "|\t  "<< block.category
+                <<"|\t  \033[32m"<<to_upper(block.type)<<"\033[0m|\t  "<< block.money_amount << "|\t  " << block.description<<"|\n"; 
+            }
+        }
+
+        else if(to_upper(block.date).find(finding_word) != std::string::npos){
+            if(block.type == "spend"){
+                std::cout << block.date << "|\t  "<< block.category
+                <<"|\t  \033[31m"<<to_upper(block.type)<<"\033[0m|\t  "<< block.money_amount << "|\t  " << block.description<<"|\n"; 
+            }
+            else{
+                std::cout << block.date << "|\t  "<< block.category
+                <<"|\t  \033[32m"<<to_upper(block.type)<<"\033[0m|\t  "<< block.money_amount << "|\t  " << block.description<<"|\n"; 
+            }
+        }
+
+        else if(to_upper(block.category).find(finding_word) != std::string::npos){
+            if(block.type == "spend"){
+                std::cout << block.date << "|\t  "<< block.category
+                <<"|\t  \033[31m"<<to_upper(block.type)<<"\033[0m|\t  "<< block.money_amount << "|\t  " << block.description<<"|\n"; 
+            }
+            else{
+                std::cout << block.date << "|\t  "<< block.category
+                <<"|\t  \033[32m"<<to_upper(block.type)<<"\033[0m|\t  "<< block.money_amount << "|\t  " << block.description<<"|\n"; 
+            }
+        }
+
+    }
+    }
+    std::cout << "Press any button + ENTER to continue: ";
+    std::cin >> spam;
 }
