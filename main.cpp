@@ -13,6 +13,11 @@
     analyze amount of transactions
     analyze the most used type of transaction
 
+    function analyze:
+    --Analyze circulation of money(is balance in + or -)
+    --Analyze how much earns, spends
+    --
+
 
 */
 
@@ -25,7 +30,7 @@ class Transaction{
     std::string description = "";
 };
 
-
+void show_balance(std::vector<Transaction>& transactions);
 void create_transaction(std::vector<Transaction>& transactions);
 void save_transactions(std::vector<Transaction>& transactions);
 void load_transactions(std::vector<Transaction>& transactions);
@@ -35,6 +40,7 @@ void delete_transaction(std::vector<Transaction>& transactions);
 void change_transaction(std::vector<Transaction>& transactions);
 std::string to_upper(std::string text);
 void find_transactions(std::vector<Transaction>& transactions);
+void show_earning(std::vector<Transaction>& transactions);
 
 
 
@@ -112,7 +118,7 @@ void show_menu(std::vector<Transaction>& transactions){
         std::cout << "\n=-_-=-_-=BANK TRANSACTION LIST=-_-=-_-=\n"<<"1. Create transaction\n"
         <<"2. Show transaction list\n"<<"3. Delete transation\n"<<"4. Change transaction\n"
         <<"5. Find transaction\n"<<"7. Show only income\n"<<"8. Show only spendings\n"
-        <<"9. Save and Quit\n"<<"""=-_-=-_-=-_-=-_-=-_-=-_-=-_-=-_-=-_-=-_-=";
+        <<"9. Save and Quit\n"<<"=-_-=-_-=-_-=-_-=-_-=-_-=-_-=-_-=-_-=-_-=";
         std::cout << "\nPlease enter what you want to do: ";
         std::cin >> choise;
 
@@ -138,13 +144,13 @@ void show_menu(std::vector<Transaction>& transactions){
             find_transactions(transactions);
         }
         else if(choise == 6){
-
+            show_balance(transactions);
         }
         else if(choise == 7){
-            
+            show_earning(transactions);
         }
         else if(choise == 8){
-
+            show_spending(transactions);
         }
         else if(choise == 9){
             save_transactions(transactions);
@@ -164,12 +170,12 @@ void list_transactions(std::vector<Transaction>& transactions){
         for(const auto& block : transactions){
             ++counter;
             if(block.type == "spend"){
-            std::cout << counter << ".|\t " << block.date<< "|\t  "<< block.category
-            <<"|\t  \033[31m"<<to_upper(block.type)<<"\033[0m|\t  "<< block.money_amount << "|\t  " << block.description<<"|\n"; 
+            std::cout << counter << ".|\t" << block.date<< "|\t"<< block.category
+            <<"|\t\033[31m"<<to_upper(block.type)<<"\033[0m|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
         }
         else{
-            std::cout << counter << ".|\t " << block.date<< "|\t  "<< block.category
-            <<"|\t  \033[32m"<<to_upper(block.type)<<"\033[0m|\t  "<< block.money_amount << "|\t  " << block.description<<"|\n"; 
+            std::cout << counter << ".|\t " << block.date<< "|\t"<< block.category
+            <<"|\t\033[32m"<<to_upper(block.type)<<"\033[0m|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
         }
         }
     }
@@ -200,7 +206,7 @@ void delete_transaction(std::vector<Transaction>& transactions){
 
         }
         else{
-            transactions.erase(transactions.begin(), transactions.begin() + choise);
+            transactions.erase(transactions.begin() + (choise - 1));
             save_transactions(transactions);
             succes = true;
         }
@@ -303,33 +309,33 @@ void find_transactions(std::vector<Transaction>& transactions){
         if(to_upper(block.description).find(finding_word) != std::string::npos){
             if(block.type == "spend"){
                 std::cout << block.date << "|\t  "<< block.category
-                <<"|\t  \033[31m"<<to_upper(block.type)<<"\033[0m|\t  "<< block.money_amount << "|\t  " << block.description<<"|\n"; 
+                <<"|\t\033[31m"<<to_upper(block.type)<<"\033[0m|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
             }
             else{
-                std::cout << block.date << "|\t  "<< block.category
-                <<"|\t  \033[32m"<<to_upper(block.type)<<"\033[0m|\t  "<< block.money_amount << "|\t  " << block.description<<"|\n"; 
+                std::cout << block.date << "|\t"<< block.category
+                <<"|\t\033[32m"<<to_upper(block.type)<<"\033[0m|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
             }
         }
 
         else if(to_upper(block.date).find(finding_word) != std::string::npos){
             if(block.type == "spend"){
                 std::cout << block.date << "|\t  "<< block.category
-                <<"|\t  \033[31m"<<to_upper(block.type)<<"\033[0m|\t  "<< block.money_amount << "|\t  " << block.description<<"|\n"; 
+                <<"|\t\033[31m"<<to_upper(block.type)<<"\033[0m|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
             }
             else{
                 std::cout << block.date << "|\t  "<< block.category
-                <<"|\t  \033[32m"<<to_upper(block.type)<<"\033[0m|\t  "<< block.money_amount << "|\t  " << block.description<<"|\n"; 
+                <<"|\t\033[32m"<<to_upper(block.type)<<"\033[0m|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
             }
         }
 
         else if(to_upper(block.category).find(finding_word) != std::string::npos){
             if(block.type == "spend"){
-                std::cout << block.date << "|\t  "<< block.category
-                <<"|\t  \033[31m"<<to_upper(block.type)<<"\033[0m|\t  "<< block.money_amount << "|\t  " << block.description<<"|\n"; 
+                std::cout << block.date << "|\t"<< block.category
+                <<"|\t\033[31m"<<to_upper(block.type)<<"\033[0m|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
             }
             else{
                 std::cout << block.date << "|\t  "<< block.category
-                <<"|\t  \033[32m"<<to_upper(block.type)<<"\033[0m|\t  "<< block.money_amount << "|\t  " << block.description<<"|\n"; 
+                <<"|\t\033[32m"<<to_upper(block.type)<<"\033[0m|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
             }
         }
 
@@ -337,4 +343,37 @@ void find_transactions(std::vector<Transaction>& transactions){
     }
     std::cout << "Press any button + ENTER to continue: ";
     std::cin >> spam;
+}
+
+void show_earning(std::vector<Transaction>& transactions){
+    std::string spam;
+    for(const auto& block : transactions){
+        if(block.type == "earn"){
+            std::cout << block.date << "|\t  "<< block.category
+            <<"|\t\033[32m"<<to_upper(block.type)<<"\033[0m|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
+        }
+    }
+    std::cout << "Press any button ENTER to continue: ";
+    std::cin >> spam;
+}
+
+void show_spending(std::vector<Transaction>& transactions){
+    std::string spam;
+    for(const auto& block : transactions){
+        if(block.type == "spend"){
+            std::cout << block.date << "|\t  "<< block.category
+            <<"|\t\033[31m"<<to_upper(block.type)<<"\033[0m|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
+        }
+    }
+    std::cout << "Press any button ENTER to continue: ";
+    std::cin >> spam;
+}
+
+/*
+
+    Function read all transactions and adds it all to suma, if spend -suma if earn +suma
+
+*/
+void show_balance(std::vector<Transaction>& transactions){
+
 }
