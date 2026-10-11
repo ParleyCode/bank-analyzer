@@ -45,27 +45,35 @@ void load_transactions(std::vector<Transaction>& transactions){
 }
 
 //Function to save transactions to the file
-void save_transactions(std::vector<Transaction>& transactions){
+void create_transaction(std::vector<Transaction>& transactions){
     Transaction transaction;
 
     std::string type = "";
     std::string category = "";
-    double money_amount = 0;
+    double money_amount;
     std::string date = "";
     std::string description = "";
 
     std::cout << "Please enter date of the transaction: ";
-    std::cin.clear(); std::cin.ignore(10000);
+    std::cin.clear(); std::cin.ignore(10000, '\n');
     std::getline(std::cin, date);
     std::cout << "Please input type of your transaction(spend/earn): ";
     std::cin >> type;
     std::cout << "Please enter category of your transaction: ";
-    std::cin.clear(); std::cin.ignore(10000);
+    std::cin.clear(); std::cin.ignore(10000, '\n');
     std::getline(std::cin, category);
     std::cout << "Please enter amount of money on this transaction: ";
+    while(!(std::cin >> money_amount)){
     std::cin >> money_amount;
+    if(!(std::cin >> money_amount)){
+        std::cout << "Incorrect input!\n";
+        std::cin.clear(); std::cin.ignore(10000, '\n');
+        std::cout << "Please enter amount of money on this transaction: ";
+
+    }
+    }
     std::cout << "Enter description to the transaction: ";
-    std::cin.clear(); std::cin.ignore(10000);
+    std::cin.clear(); std::cin.ignore(10000, '\n');
     std::getline(std::cin, description);
 
     transaction.category = category;
@@ -79,7 +87,7 @@ void save_transactions(std::vector<Transaction>& transactions){
 }
 
 //Function to create new transaction to the list
-void create_transaction(std::vector<Transaction>& transactions){
+void save_transactions(std::vector<Transaction>& transactions){
 
 }
 
@@ -132,5 +140,15 @@ void show_menu(std::vector<Transaction>& transactions){
 }
 
 void list_transactions(std::vector<Transaction>& transactions){
+    Transaction transaction;
+    int counter = 0;
+    std::string spam;
 
+    for(const auto& block : transactions){
+        ++counter;
+        std::cout << counter << ".|\t " << block.date<< "|\t  "<< block.category
+        <<"|\t  "<<block.type<<"|\t  "<< block.money_amount << "|\t  " << block.description<<"|\n"; 
+    }
+    std::cout << "Please press any button ENTER to continue ";
+    std::cin >> spam;
 }
