@@ -30,6 +30,7 @@ void save_transactions(std::vector<Transaction>& transactions);
 void load_transactions(std::vector<Transaction>& transactions);
 void show_menu(std::vector<Transaction>& transactions);
 void list_transactions(std::vector<Transaction>& transactions);
+void delete_transaction(std::vector<Transaction>& transactions);
 
 
 
@@ -99,7 +100,7 @@ void show_menu(std::vector<Transaction>& transactions){
         std::cout << "=-_-=-_-=BANK TRANSACTION LIST=-_-=-_-=\n"<<"1. Create transaction\n"
         <<"2. Show transaction list\n"<<"3. Delete transation\n"<<"4. Change transaction\n"
         <<"5. Find transaction\n"<<"7. Show only income\n"<<"8. Show only spendings\n"
-        <<"=-_-=-_-=-_-=-_-=-_-=-_-=-_-=-_-=-_-=-_-=";
+        <<"9. Save and Quit\n"<<"""=-_-=-_-=-_-=-_-=-_-=-_-=-_-=-_-=-_-=-_-=";
         std::cout << "\nPlease enter what you want to do: ";
         std::cin >> choise;
 
@@ -116,7 +117,7 @@ void show_menu(std::vector<Transaction>& transactions){
             list_transactions(transactions);
         }
         else if(choise == 3){
-
+            delete_transaction(transactions);
         }
         else if(choise == 4){
 
@@ -133,6 +134,10 @@ void show_menu(std::vector<Transaction>& transactions){
         else if(choise == 8){
 
         }
+        else if(choise == 9){
+            save_transactions(transactions);
+            exit(0);
+        }
         else{
             std::cout << "\nIncorrect input\n\n";
         }
@@ -143,12 +148,45 @@ void list_transactions(std::vector<Transaction>& transactions){
     Transaction transaction;
     int counter = 0;
     std::string spam;
-
-    for(const auto& block : transactions){
-        ++counter;
-        std::cout << counter << ".|\t " << block.date<< "|\t  "<< block.category
-        <<"|\t  "<<block.type<<"|\t  "<< block.money_amount << "|\t  " << block.description<<"|\n"; 
+    if(!(transactions.empty())){
+        for(const auto& block : transactions){
+            ++counter;
+            std::cout << counter << ".|\t " << block.date<< "|\t  "<< block.category
+            <<"|\t  "<<block.type<<"|\t  "<< block.money_amount << "|\t  " << block.description<<"|\n"; 
+        }
+    }
+    else{
+        std::cout << "There is nothing to list :( \n";
     }
     std::cout << "Please press any button ENTER to continue ";
     std::cin >> spam;
+}
+
+void delete_transaction(std::vector<Transaction>& transactions){
+    int choise = 0;
+    bool succes = false;
+
+    list_transactions(transactions);
+    if(transactions.empty()){
+        //Skip
+    }
+
+    else{
+        std::cout << "Please enter which transaction you want to delete: ";
+
+    do{
+        std::cin >> choise;
+        if(!std::cin >> choise || choise > transactions.size() || choise <= 0){
+            std::cout << "Incorrect input!";
+            std::cin.clear();std::cin.ignore(10000, '\n');
+            std::cout << "\nPlease enter which transaction you want to delete: ";
+
+        }
+        else{
+            transactions.erase(transactions.begin(), transactions.begin() + choise);
+            save_transactions(transactions);
+            succes = true;
+        }
+    }while(succes == false);
+    }
 }
