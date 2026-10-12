@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <fstream>
 
 
 
@@ -41,19 +42,76 @@ void change_transaction(std::vector<Transaction>& transactions);
 std::string to_upper(std::string text);
 void find_transactions(std::vector<Transaction>& transactions);
 void show_earning(std::vector<Transaction>& transactions);
+void show_spending(std::vector<Transaction>& transactions);
 
 
 
 
 int main(){
-    std::vector<Transaction> transactions;   
+    std::vector<Transaction> transactions;  
+    load_transactions(transactions);
+     
     show_menu(transactions);
 }
 
 //Function to load transactions from the file
 void load_transactions(std::vector<Transaction>& transactions){
+    Transaction transaction;
+    std::string type = "";
+    std::string category = "";
+    double money_amount = 0.0;
+    std::string date = "";
+    std::string description = "";
 
+    std::ifstream fin;
+
+    fin.open("transactions.txt");
+    while (std::getline(fin, type)) {
+        if (type.empty()) {
+            continue;
+        }
+        std::getline(fin, category);
+        if (category.empty()){
+            continue;
+        }
+        std::getline(fin, date);
+        if (date.empty()){
+            continue;
+        }
+        std::getline(fin, description);
+        if(description.empty()){
+            continue;
+        }
+
+        fin >> money_amount;
+        if(money_amount == 0.0){
+            continue;
+        }
+        transaction.category = category;
+        transaction.date = date;
+        transaction.description = description;
+        transaction.type = type;
+        transaction.money_amount = money_amount;
+
+        transactions.push_back(transaction);
+    }
 }
+
+//Function to save new transaction to the list
+void save_transactions(std::vector<Transaction>& transactions){
+    Transaction transction;
+    std::ofstream fout;
+
+    fout.open("transactions.txt");
+    for(const auto& block : transactions){
+        fout << block.type<<"\n";
+        fout << block.category<<"\n";
+        fout << block.date<<"\n";
+        fout << block.description<<"\n";
+        fout << block.money_amount<<"\n";
+    }
+}
+
 
 //Function to save transactions to the file
 void create_transaction(std::vector<Transaction>& transactions){
@@ -106,10 +164,6 @@ void create_transaction(std::vector<Transaction>& transactions){
     //save_transaction
 }
 
-//Function to create new transaction to the list
-void save_transactions(std::vector<Transaction>& transactions){
-
-}
 
 //Function to show the main menu of the program
 void show_menu(std::vector<Transaction>& transactions){
@@ -117,7 +171,7 @@ void show_menu(std::vector<Transaction>& transactions){
     while(true){
         std::cout << "\n=-_-=-_-=BANK TRANSACTION LIST=-_-=-_-=\n"<<"1. Create transaction\n"
         <<"2. Show transaction list\n"<<"3. Delete transation\n"<<"4. Change transaction\n"
-        <<"5. Find transaction\n"<<"7. Show only income\n"<<"8. Show only spendings\n"
+        <<"5. Find transaction\n"<<"6. Show balance\n"<<"7. Show only income\n"<<"8. Show only spendings\n"
         <<"9. Save and Quit\n"<<"=-_-=-_-=-_-=-_-=-_-=-_-=-_-=-_-=-_-=-_-=";
         std::cout << "\nPlease enter what you want to do: ";
         std::cin >> choise;
@@ -347,23 +401,45 @@ void find_transactions(std::vector<Transaction>& transactions){
 
 void show_earning(std::vector<Transaction>& transactions){
     std::string spam;
+    int counter = 0;
+    if(transactions.empty()){
+        std::cout << "There is no transactions to search from :(\n";
+    }
+    else{
     for(const auto& block : transactions){
         if(block.type == "earn"){
+            ++counter;
             std::cout << block.date << "|\t  "<< block.category
             <<"|\t\033[32m"<<to_upper(block.type)<<"\033[0m|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
         }
     }
+    if(counter == 0){
+        std::cout << "There is no income transactions :(\n";
+    }
+    }
     std::cout << "Press any button ENTER to continue: ";
     std::cin >> spam;
+    
 }
 
 void show_spending(std::vector<Transaction>& transactions){
     std::string spam;
+    int counter = 0;
+
+    if(transactions.empty()){
+        std::cout << "There is no transactions to search from :(";
+    }
+    else{
     for(const auto& block : transactions){
         if(block.type == "spend"){
+            ++counter;
             std::cout << block.date << "|\t  "<< block.category
             <<"|\t\033[31m"<<to_upper(block.type)<<"\033[0m|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
         }
+    }
+    if(counter == 0){
+        std::cout << "There is no spending transactions :(\n";
+    }
     }
     std::cout << "Press any button ENTER to continue: ";
     std::cin >> spam;
@@ -375,5 +451,29 @@ void show_spending(std::vector<Transaction>& transactions){
 
 */
 void show_balance(std::vector<Transaction>& transactions){
+    double money_balance = 0;
+    int earn_counter = 0;
+    int spend_counter = 0;
+    std::string spam;
 
+    if(transactions.empty()){
+        std::cout << "There is nothing to analyze from :(";
+    }
+
+    else{
+    for(const auto& block : transactions){
+        if(block.type == "earn"){
+            money_balance += block.money_amount;
+            ++earn_counter;
+        }
+        else{
+            money_balance -= block.money_amount;
+            ++spend_counter;
+        }
+    }
+    std::cout << "Money balance of your transactions is: " << money_balance<< " | amount of earns "
+    << earn_counter << " | amount of spends "<< spend_counter;
+}
+    std::cout << "\nPlease enter any button ENTER to continue: ";
+    std::cin >> spam;
 }
