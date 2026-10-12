@@ -1,7 +1,10 @@
 #include <iostream>
 #include <vector>
+#include <string>
 #include <algorithm>
 #include <fstream>
+#include <chrono>
+#include <sstream>
 
 
 
@@ -22,14 +25,39 @@
 
 */
 
+std::chrono::year_month_day date_unparse(std::string date);
+
 class Transaction{
     public:
     std::string type = "";
     std::string category = "";
     double money_amount = 0;
-    std::string date = "";
+    int day, month, year;
     std::string description = "";
+
+    std::chrono::year_month_day date;
 };
+
+std::chrono::year_month_day date_unparse(std::string date){
+    int year, month, day;
+    std::string part, part1, part2;
+    std::stringstream str(date);
+
+    std::getline(str, part, '-');
+    std::getline(str, part1, '-');
+    std::getline(str, part2, '-');
+
+    year = std::stoi(part);
+    month = std::stoi(part1);
+    day = std::stoi(part2);
+
+    std::chrono::year_month_day int_date{
+        std::chrono::year(year),
+        std::chrono::month(month),
+        std::chrono::day(day)
+    };
+    return int_date;
+}
 
 void show_balance(std::vector<Transaction>& transactions);
 void create_transaction(std::vector<Transaction>& transactions);
@@ -49,8 +77,7 @@ void show_spending(std::vector<Transaction>& transactions);
 
 int main(){
     std::vector<Transaction> transactions;  
-    load_transactions(transactions);
-     
+    load_transactions(transactions); 
     show_menu(transactions);
 }
 
@@ -88,7 +115,7 @@ void load_transactions(std::vector<Transaction>& transactions){
             continue;
         }
         transaction.category = category;
-        transaction.date = date;
+        transaction.date = date_unparse(date);
         transaction.description = description;
         transaction.type = type;
         transaction.money_amount = money_amount;
@@ -155,7 +182,7 @@ void create_transaction(std::vector<Transaction>& transactions){
     std::getline(std::cin, description);
 
     transaction.category = category;
-    transaction.date = date;
+    transaction.date = date_unparse(date);
     transaction.description = description;
     transaction.money_amount = money_amount;
     transaction.type = type;
@@ -326,7 +353,6 @@ void change_transaction(std::vector<Transaction>& transactions){
             std::getline(std::cin, description);
 
             transactions[choise - 1].category = category;
-            transactions[choise - 1].date = date;
             transactions[choise - 1].type = type;
             transactions[choise - 1].money_amount = money_amount;
             transactions[choise - 1].description = description;
@@ -371,7 +397,7 @@ void find_transactions(std::vector<Transaction>& transactions){
             }
         }
 
-        else if(to_upper(block.date).find(finding_word) != std::string::npos){
+        /*else if(to_upper(block.date).find(finding_word) != std::string::npos){
             if(block.type == "spend"){
                 std::cout << block.date << "|\t  "<< block.category
                 <<"|\t\033[31m"<<to_upper(block.type)<<"\033[0m|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
@@ -381,7 +407,7 @@ void find_transactions(std::vector<Transaction>& transactions){
                 <<"|\t\033[32m"<<to_upper(block.type)<<"\033[0m|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
             }
         }
-
+        */
         else if(to_upper(block.category).find(finding_word) != std::string::npos){
             if(block.type == "spend"){
                 std::cout << block.date << "|\t"<< block.category
