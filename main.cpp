@@ -38,9 +38,34 @@ class Transaction{
     std::chrono::year_month_day date;
 };
 
+bool isDateValid(std::string date){
+
+    std::string day_part, month_part, year_part;
+
+    std::stringstream str(date);
+
+    std::getline(str, year_part, '-');
+    std::getline(str, month_part, '-');
+    std::getline(str, day_part, '-');
+
+    try {
+    int day = std::stoi(day_part);
+    int month = std::stoi(month_part);
+    int year = std::stoi(year_part);
+}
+catch (const std::invalid_argument&) {
+    return false;
+}
+catch (const std::out_of_range&) {
+    return false;
+}
+return true;
+}
+
 std::chrono::year_month_day date_unparse(std::string date){
     int year, month, day;
     std::string part, part1, part2;
+
     std::stringstream str(date);
 
     std::getline(str, part, '-');
@@ -143,6 +168,7 @@ void save_transactions(std::vector<Transaction>& transactions){
 //Function to save transactions to the file
 void create_transaction(std::vector<Transaction>& transactions){
     Transaction transaction;
+    bool date_succes = false;
     bool type_succes = false;
     std::string type = "";
     std::string category = "";
@@ -150,9 +176,18 @@ void create_transaction(std::vector<Transaction>& transactions){
     std::string date = "";
     std::string description = "";
 
-    std::cout << "Please enter date of the transaction: ";
-    std::cin.clear(); std::cin.ignore(10000, '\n');
-    std::getline(std::cin, date);
+    std::cin.clear();std::cin.ignore(10000, '\n');
+    do{
+        std::cout << "\nPlease enter date of the transaction: ";
+        std::getline(std::cin, date);
+        if(isDateValid(date) == true && date_unparse(date).ok()){
+            date_succes = true;
+        }
+        else{
+            std::cout << "Date input is incorrect";
+        }
+    }while(date_succes == false);
+
     do{
         std::cout << "Please enter type of the transaction(earn/spend): ";
         std::getline(std::cin, type);
@@ -167,8 +202,8 @@ void create_transaction(std::vector<Transaction>& transactions){
     std::cout << "Please enter category of your transaction: ";
     std::getline(std::cin, category);
     std::cout << "Please enter amount of money on this transaction: ";
-    while(!(std::cin >> money_amount)){
 
+    while(!(std::cin >> money_amount)){
     std::cin >> money_amount;
     if(!(std::cin >> money_amount)){
         std::cout << "Incorrect input!\n";
@@ -251,12 +286,12 @@ void list_transactions(std::vector<Transaction>& transactions){
         for(const auto& block : transactions){
             ++counter;
             if(block.type == "spend"){
-            std::cout << counter << ".|\t" << block.date<< "|\t"<< block.category
-            <<"|\t\033[31m"<<to_upper(block.type)<<"\033[0m|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
+            std::cout << counter << ".|\t\t" << block.date<< "|\t\t"<< block.category
+            <<"|\t\t\033[31m"<<to_upper(block.type)<<"\033[0m|\t\t"<< block.money_amount << "|\t\t" << block.description<<"|\n"; 
         }
         else{
-            std::cout << counter << ".|\t " << block.date<< "|\t"<< block.category
-            <<"|\t\033[32m"<<to_upper(block.type)<<"\033[0m|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
+            std::cout << counter << ".|\t\t" << block.date<< "|\t\t"<< block.category
+            <<"|\t\t\033[32m"<<to_upper(block.type)<<"\033[0m|\t\t"<< block.money_amount << "|\t\t" << block.description<<"|\n"; 
         }
         }
     }
@@ -302,6 +337,7 @@ void change_transaction(std::vector<Transaction>& transactions){
     int choise = 0;
     bool succes = false;
     bool money_succes = false;
+    bool date_succes = false;
     bool type_succes = false;
     std::string date;
     std::string description;
@@ -321,10 +357,23 @@ void change_transaction(std::vector<Transaction>& transactions){
             std::cin.clear();std::cin.ignore(10000, '\n');
             std::cout << "\nPlease enter which transaction you want to change: ";
         }
+
         else{
+
             std::cin.clear();std::cin.ignore(10000, '\n');
-            std::cout << "Please enter new date of the transaction: ";
-            std::getline(std::cin, date);
+            //Cheking is date valid
+            do{
+                std::cout << "\nPlease enter new date of the transaction: ";
+                std::getline(std::cin, date);
+                if(isDateValid(date) == true && date_unparse(date).ok()){
+                    date_succes = true;
+                    }
+                else{
+                    std::cout << "Date input is incorrect";
+                }
+            }while(date_succes == false);
+
+            //Checking is type valid
             std::cout << "Please enter new category of the transaction: ";
             std::getline(std::cin, category);
             do{
@@ -342,7 +391,8 @@ void change_transaction(std::vector<Transaction>& transactions){
                 std::cout << "Please enter new amount of money: ";
                 if(!(std::cin >> money_amount)){
                     std::cout << "Incorrect input! \n";
-                    std::cin.clear(); std::cin.ignore(10000, '\n');                }
+                    std::cin.clear(); std::cin.ignore(10000, '\n');                
+                }
                 else{
                     money_succes = true;
                 }
@@ -389,11 +439,11 @@ void find_transactions(std::vector<Transaction>& transactions){
         if(to_upper(block.description).find(finding_word) != std::string::npos){
             if(block.type == "spend"){
                 std::cout << block.date << "|\t  "<< block.category
-                <<"|\t\033[31m"<<to_upper(block.type)<<"\033[0m|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
+                <<"|\t\t\033[31m"<<to_upper(block.type)<<"\033[0m|\t\t"<< block.money_amount << "|\t\t" << block.description<<"|\n"; 
             }
             else{
                 std::cout << block.date << "|\t"<< block.category
-                <<"|\t\033[32m"<<to_upper(block.type)<<"\033[0m|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
+                <<"|\t\t\033[32m"<<to_upper(block.type)<<"\033[0m|\t\t"<< block.money_amount << "|\t\t" << block.description<<"|\n"; 
             }
         }
 
@@ -460,7 +510,7 @@ void show_spending(std::vector<Transaction>& transactions){
         if(block.type == "spend"){
             ++counter;
             std::cout << block.date << "|\t  "<< block.category
-            <<"|\t\033[31m"<<to_upper(block.type)<<"\033[0m|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
+            <<"|\t\t\033[31m"<<to_upper(block.type)<<"\033[0m|\t\t"<< block.money_amount << "|\t\t" << block.description<<"|\n"; 
         }
     }
     if(counter == 0){
