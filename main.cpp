@@ -85,7 +85,7 @@ std::chrono::year_month_day date_unparse(std::string date){
     return int_date;
 }
 
-void show_balance(std::vector<Transaction>& transactions);
+void show_information(std::vector<Transaction>& transactions);
 void create_transaction(std::vector<Transaction>& transactions);
 void save_transactions(std::vector<Transaction>& transactions);
 void load_transactions(std::vector<Transaction>& transactions);
@@ -238,7 +238,7 @@ void show_menu(std::vector<Transaction>& transactions){
     while(true){
         std::cout << "\n=-_-=-_-=BANK TRANSACTION LIST=-_-=-_-=\n"<<"1. Create transaction\n"
         <<"2. Show transaction list\n"<<"3. Delete transation\n"<<"4. Change transaction\n"
-        <<"5. Find transaction\n"<<"6. Show balance\n"<<"7. Show only income\n"<<"8. Show only spendings\n"
+        <<"5. Find transaction\n"<<"6. Show information\n"<<"7. Show only income\n"<<"8. Show only spendings\n"
         <<"9. Show transactions in diapazone\n"<<"10. Save and Quit\n"<<"=-_-=-_-=-_-=-_-=-_-=-_-=-_-=-_-=-_-=-_-=";
         std::cout << "\nPlease enter what you want to do: ";
         std::cin >> choise;
@@ -265,7 +265,7 @@ void show_menu(std::vector<Transaction>& transactions){
             find_transactions(transactions);
         }
         else if(choise == 6){
-            show_balance(transactions);
+            show_information(transactions);
         }
         else if(choise == 7){
             show_earning(transactions);
@@ -536,10 +536,16 @@ void show_spending(std::vector<Transaction>& transactions){
     Function read all transactions and adds it all to suma, if spend -suma if earn +suma
 
 */
-void show_balance(std::vector<Transaction>& transactions){
+void show_information(std::vector<Transaction>& transactions){
     double money_balance = 0;
     int earn_counter = 0;
     int spend_counter = 0;
+    int biggest_amount_transaction = transactions[0].money_amount;
+    int lowest_amount_transaction = transactions[0].money_amount;
+
+    int biggest_income_tranasction = transactions[0].money_amount;
+    int lowest_income_transaction = transactions[0].money_amount;
+
     std::string spam;
 
     if(transactions.empty()){
@@ -551,14 +557,29 @@ void show_balance(std::vector<Transaction>& transactions){
         if(block.type == "earn"){
             money_balance += block.money_amount;
             ++earn_counter;
+            if(lowest_income_transaction >= block.money_amount){
+                lowest_income_transaction = block.money_amount;
+            }
+            else if(lowest_income_transaction <= block.money_amount){
+                biggest_income_tranasction = block.money_amount;
+            }
         }
         else{
             money_balance -= block.money_amount;
             ++spend_counter;
+            if(lowest_amount_transaction >= -1 * (block.money_amount)){
+                lowest_amount_transaction = block.money_amount;
+            }
+            else if(lowest_amount_transaction <= -1 * (block.money_amount)){
+                biggest_amount_transaction = block.money_amount;
+            }
         }
+
     }
-    std::cout << "Money balance of your transactions is: " << money_balance<< " | amount of earns "
-    << earn_counter << " | amount of spends "<< spend_counter;
+    std::cout << "| Money balance of your transactions is: \033[33m" << money_balance<< "\033[0m | amount of earns "
+    << earn_counter << " | amount of spends "<< spend_counter << "\n| biggest spend is -\033[31m"
+    << lowest_amount_transaction<<"\033[0m | lowest spend transaction is \033[32m-"<<biggest_amount_transaction << "\033[0m"
+    << "\n| biggest income amount is \033[32m" << biggest_income_tranasction<< "\033[0m | lowest income amount is \033[31m" << lowest_income_transaction << "\033[0m\n";
 }
     std::cout << "\nPlease enter any button ENTER to continue: ";
     std::cin >> spam;
