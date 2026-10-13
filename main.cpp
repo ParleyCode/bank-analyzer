@@ -219,7 +219,6 @@ void create_transaction(std::vector<Transaction>& transactions){
     std::cout << "Please enter amount of money on this transaction: ";
 
     while(!(std::cin >> money_amount)){
-    std::cin >> money_amount;
     if(!(std::cin >> money_amount)){
         std::cout << "Incorrect input!\n";
         std::cin.clear(); std::cin.ignore(10000, '\n');
@@ -557,11 +556,11 @@ void show_information(std::vector<Transaction>& transactions){
     double money_balance = 0;
     int earn_counter = 0;
     int spend_counter = 0;
-    int biggest_amount_transaction = transactions[0].money_amount;
-    int lowest_amount_transaction = transactions[0].money_amount;
+    double biggest_amount_transaction = transactions[0].money_amount;
+    double lowest_amount_transaction = transactions[0].money_amount;
 
-    int biggest_income_tranasction = transactions[0].money_amount;
-    int lowest_income_transaction = transactions[0].money_amount;
+    double biggest_income_transaction = transactions[0].money_amount;
+    double lowest_income_transaction = transactions[0].money_amount;
 
     std::string balance;
 
@@ -578,17 +577,17 @@ void show_information(std::vector<Transaction>& transactions){
             if(lowest_income_transaction >= block.money_amount){
                 lowest_income_transaction = block.money_amount;
             }
-            else if(lowest_income_transaction <= block.money_amount){
-                biggest_income_tranasction = block.money_amount;
+            else if(biggest_income_transaction <= block.money_amount){
+                biggest_income_transaction = block.money_amount;
             }
         }
         else{
             money_balance -= block.money_amount;
             ++spend_counter;
-            if(lowest_amount_transaction >= -1 * (block.money_amount)){
+            if(-1 * lowest_amount_transaction >= -1 * (block.money_amount)){
                 lowest_amount_transaction = block.money_amount;
             }
-            else if(lowest_amount_transaction <= -1 * (block.money_amount)){
+            else if(-1 * biggest_amount_transaction <= -1 * block.money_amount){
                 biggest_amount_transaction = block.money_amount;
             }
         }
@@ -603,7 +602,7 @@ void show_information(std::vector<Transaction>& transactions){
     std::cout << "| Money balance of your transactions is: " << color_text(balance, Color::Yellow)<< " | amount of earns "
     << earn_counter << " | amount of expenses "<< spend_counter << "\n| biggest expense transaction is -"
     << color_text(std::to_string(lowest_amount_transaction), Color::Red)<<" | lowest expense transaction is -"<<color_text(std::to_string(biggest_amount_transaction), Color::Green)
-    << "\n| biggest income amount is " << color_text(std::to_string(biggest_income_tranasction), Color::Green)<< " | lowest income amount is " << color_text(std::to_string(lowest_income_transaction), Color::Yellow) << "\n";
+    << "\n| biggest income amount is " << color_text(std::to_string(biggest_income_transaction), Color::Green)<< " | lowest income amount is " << color_text(std::to_string(lowest_income_transaction), Color::Yellow) << "\n";
 }
     }
     std::cout << "\nPlease enter any button ENTER to continue: ";
@@ -674,11 +673,11 @@ void show_diapazone(std::vector<Transaction>& transactions){
 std::string color_text(std::string x, Color color){
     std::string text;
     if(color == Color::Red){
-        text = "\033[32m"+x+"\033[0m";
+        text = "\033[31m"+x+"\033[0m";
         return text;
     }
     else if(color == Color::Green){
-        text = "\033[31m"+x+"\033[0m";
+        text = "\033[32m"+x+"\033[0m";
         return text;
     }
     else if(color == Color::Yellow){
