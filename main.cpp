@@ -34,6 +34,7 @@ class Transaction{
     double money_amount = 0;
     int day, month, year;
     std::string description = "";
+    std::string str_date = "";
 
     std::chrono::year_month_day date;
 };
@@ -140,6 +141,7 @@ void load_transactions(std::vector<Transaction>& transactions){
             continue;
         }
         transaction.category = category;
+        transaction.str_date = date;
         transaction.date = date_unparse(date);
         transaction.description = description;
         transaction.type = type;
@@ -217,6 +219,7 @@ void create_transaction(std::vector<Transaction>& transactions){
     std::getline(std::cin, description);
 
     transaction.category = category;
+    transaction.str_date = date;
     transaction.date = date_unparse(date);
     transaction.description = description;
     transaction.money_amount = money_amount;
@@ -402,6 +405,8 @@ void change_transaction(std::vector<Transaction>& transactions){
             std::cout << "Please enter new description of the transaction: ";
             std::getline(std::cin, description);
 
+            transactions[choise - 1].str_date = date;
+            transactions[choise - 1].date = date_unparse(date);
             transactions[choise - 1].category = category;
             transactions[choise - 1].type = type;
             transactions[choise - 1].money_amount = money_amount;
@@ -447,7 +452,7 @@ void find_transactions(std::vector<Transaction>& transactions){
             }
         }
 
-        /*else if(to_upper(block.date).find(finding_word) != std::string::npos){
+        else if(to_upper(block.str_date).find(finding_word) != std::string::npos){
             if(block.type == "spend"){
                 std::cout << block.date << "|\t  "<< block.category
                 <<"|\t\033[31m"<<to_upper(block.type)<<"\033[0m|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
@@ -457,7 +462,7 @@ void find_transactions(std::vector<Transaction>& transactions){
                 <<"|\t\033[32m"<<to_upper(block.type)<<"\033[0m|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
             }
         }
-        */
+        
         else if(to_upper(block.category).find(finding_word) != std::string::npos){
             if(block.type == "spend"){
                 std::cout << block.date << "|\t"<< block.category
