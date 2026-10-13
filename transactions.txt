@@ -1,20 +1,10 @@
 earn
 fun
 2026-10-23
-works?
-123
-earn
-FUN
-2026-08-20
-please work
-123
-spend
-fun
-2025-01-01
 fun
 123
 spend
 fun
-2026-10-24
-test
-1000
+2026-10-23
+fun
+123

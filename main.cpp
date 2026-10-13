@@ -5,6 +5,7 @@
 #include <fstream>
 #include <chrono>
 #include <sstream>
+#include <iomanip>
 
 
 
@@ -27,12 +28,17 @@
 
 std::chrono::year_month_day date_unparse(std::string date);
 
+enum class Color{
+    Red,
+    Green,
+    Yellow
+};
+
 class Transaction{
     public:
     std::string type = "";
     std::string category = "";
     double money_amount = 0;
-    int day, month, year;
     std::string description = "";
     std::string str_date = "";
 
@@ -60,7 +66,12 @@ catch (const std::invalid_argument&) {
 catch (const std::out_of_range&) {
     return false;
 }
-return true;
+if(date_unparse(date).ok()){
+    return true;
+}
+else{
+    return false;
+}
 }
 
 std::chrono::year_month_day date_unparse(std::string date){
@@ -98,6 +109,7 @@ void find_transactions(std::vector<Transaction>& transactions);
 void show_earning(std::vector<Transaction>& transactions);
 void show_spending(std::vector<Transaction>& transactions);
 void show_diapazone(std::vector<Transaction>& transactions);
+std::string color_text(std::string x, Color color);
 
 
 
@@ -183,7 +195,7 @@ void create_transaction(std::vector<Transaction>& transactions){
     do{
         std::cout << "\nPlease enter date of the transaction: ";
         std::getline(std::cin, date);
-        if(isDateValid(date) == true && date_unparse(date).ok()){
+        if(isDateValid(date) == true){
             date_succes = true;
         }
         else{
@@ -238,12 +250,11 @@ void show_menu(std::vector<Transaction>& transactions){
     while(true){
         std::cout << "\n=-_-=-_-=BANK TRANSACTION LIST=-_-=-_-=\n"<<"1. Create transaction\n"
         <<"2. Show transaction list\n"<<"3. Delete transation\n"<<"4. Change transaction\n"
-        <<"5. Find transaction\n"<<"6. Show information\n"<<"7. Show only income\n"<<"8. Show only spendings\n"
+        <<"5. Find transaction\n"<<"6. Show information\n"<<"7. Show only income\n"<<"8. Show only expenses\n"
         <<"9. Show transactions in diapazone\n"<<"10. Save and Quit\n"<<"=-_-=-_-=-_-=-_-=-_-=-_-=-_-=-_-=-_-=-_-=";
         std::cout << "\nPlease enter what you want to do: ";
-        std::cin >> choise;
 
-        if(!std::cin >> choise){
+        if(!(std::cin >> choise)){
             std::cout << "\nIncorrect input\n\n";
             std::cin.clear();std::cin.ignore(100000, '\n');
             continue;
@@ -295,11 +306,11 @@ void list_transactions(std::vector<Transaction>& transactions){
             ++counter;
             if(block.type == "spend"){
             std::cout << counter << ".|\t\t" << block.date<< "|\t\t"<< block.category
-            <<"|\t\t\033[31m"<<to_upper(block.type)<<"\033[0m|\t\t"<< block.money_amount << "|\t\t" << block.description<<"|\n"; 
+            <<"|\t\t"<<color_text(to_upper(block.type), Color::Red)<<"|\t\t"<< block.money_amount << "|\t\t" << block.description<<"|\n"; 
         }
         else{
             std::cout << counter << ".|\t\t" << block.date<< "|\t\t"<< block.category
-            <<"|\t\t\033[32m"<<to_upper(block.type)<<"\033[0m|\t\t"<< block.money_amount << "|\t\t" << block.description<<"|\n"; 
+            <<"|\t\t"<<color_text(to_upper(block.type), Color::Green)<<"|\t\t"<< block.money_amount << "|\t\t" << block.description<<"|\n"; 
         }
         }
     }
@@ -359,8 +370,7 @@ void change_transaction(std::vector<Transaction>& transactions){
     else{
     std::cout << "Please enter which transaction you want to change: ";
     do{
-        std::cin >> choise;
-        if(!std::cin >> choise || choise > transactions.size() || choise <= 0){
+        if(!(std::cin >> choise) || choise > transactions.size() || choise <= 0){
             std::cout << "Incorrect input";
             std::cin.clear();std::cin.ignore(10000, '\n');
             std::cout << "\nPlease enter which transaction you want to change: ";
@@ -373,7 +383,7 @@ void change_transaction(std::vector<Transaction>& transactions){
             do{
                 std::cout << "\nPlease enter new date of the transaction: ";
                 std::getline(std::cin, date);
-                if(isDateValid(date) == true && date_unparse(date).ok()){
+                if(isDateValid(date) == true){
                     date_succes = true;
                     }
                 else{
@@ -438,7 +448,7 @@ void find_transactions(std::vector<Transaction>& transactions){
     std::string spam;
 
     if(transactions.empty()){
-        std::cout << "There is nothing to find from :(";
+        std::cout << "There is nothing to find from :(\n";
     }
     else{
         std::cin.clear();std::cin.ignore(10000, '\n');
@@ -449,33 +459,33 @@ void find_transactions(std::vector<Transaction>& transactions){
         if(to_upper(block.description).find(finding_word) != std::string::npos){
             if(block.type == "spend"){
                 std::cout << block.date << "|\t  "<< block.category
-                <<"|\t\t\033[31m"<<to_upper(block.type)<<"\033[0m|\t\t"<< block.money_amount << "|\t\t" << block.description<<"|\n"; 
+                <<"|\t\t"<<color_text(to_upper(block.type), Color::Red)<<"|\t\t"<< block.money_amount << "|\t\t" << block.description<<"|\n"; 
             }
             else{
                 std::cout << block.date << "|\t"<< block.category
-                <<"|\t\t\033[32m"<<to_upper(block.type)<<"\033[0m|\t\t"<< block.money_amount << "|\t\t" << block.description<<"|\n"; 
+                <<"|\t\t"<<color_text(to_upper(block.type), Color::Green)<<"|\t\t"<< block.money_amount << "|\t\t" << block.description<<"|\n"; 
             }
         }
 
         else if(to_upper(block.str_date).find(finding_word) != std::string::npos){
             if(block.type == "spend"){
                 std::cout << block.date << "|\t  "<< block.category
-                <<"|\t\033[31m"<<to_upper(block.type)<<"\033[0m|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
+                <<"|\t"<<color_text(to_upper(block.type), Color::Red)<<"|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
             }
             else{
                 std::cout << block.date << "|\t  "<< block.category
-                <<"|\t\033[32m"<<to_upper(block.type)<<"\033[0m|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
+                <<"|\t"<<color_text(to_upper(block.type), Color::Green)<<"|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
             }
         }
         
         else if(to_upper(block.category).find(finding_word) != std::string::npos){
             if(block.type == "spend"){
                 std::cout << block.date << "|\t"<< block.category
-                <<"|\t\033[31m"<<to_upper(block.type)<<"\033[0m|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
+                <<"|\t"<<color_text(to_upper(block.type), Color::Red)<<"|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
             }
             else{
                 std::cout << block.date << "|\t  "<< block.category
-                <<"|\t\033[32m"<<to_upper(block.type)<<"\033[0m|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
+                <<"|\t"<<color_text(to_upper(block.type), Color::Green)<<"|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
             }
         }
 
@@ -496,7 +506,7 @@ void show_earning(std::vector<Transaction>& transactions){
         if(block.type == "earn"){
             ++counter;
             std::cout << block.date << "|\t  "<< block.category
-            <<"|\t\033[32m"<<to_upper(block.type)<<"\033[0m|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
+            <<"|\t"<<color_text(to_upper(block.type), Color::Green)<<"|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
         }
     }
     if(counter == 0){
@@ -513,18 +523,18 @@ void show_spending(std::vector<Transaction>& transactions){
     int counter = 0;
 
     if(transactions.empty()){
-        std::cout << "There is no transactions to search from :(";
+        std::cout << "There is no transactions to search from :(\n";
     }
     else{
     for(const auto& block : transactions){
         if(block.type == "spend"){
             ++counter;
             std::cout << block.date << "|\t  "<< block.category
-            <<"|\t\t\033[31m"<<to_upper(block.type)<<"\033[0m|\t\t"<< block.money_amount << "|\t\t" << block.description<<"|\n"; 
+            <<"|\t\t"<<color_text(to_upper(block.type), Color::Red)<<"|\t\t"<< block.money_amount << "|\t\t" << block.description<<"|\n"; 
         }
     }
     if(counter == 0){
-        std::cout << "There is no spending transactions :(\n";
+        std::cout << "There is no expense transactions :(\n";
     }
     }
     std::cout << "Press any button ENTER to continue: ";
@@ -537,6 +547,13 @@ void show_spending(std::vector<Transaction>& transactions){
 
 */
 void show_information(std::vector<Transaction>& transactions){
+    std::string spam;
+
+    if(transactions.empty()){
+        std::cout << "Currently there is no information to report about :(\n";
+    }
+
+    else{
     double money_balance = 0;
     int earn_counter = 0;
     int spend_counter = 0;
@@ -546,7 +563,8 @@ void show_information(std::vector<Transaction>& transactions){
     int biggest_income_tranasction = transactions[0].money_amount;
     int lowest_income_transaction = transactions[0].money_amount;
 
-    std::string spam;
+    std::string balance;
+
 
     if(transactions.empty()){
         std::cout << "There is nothing to analyze from :(";
@@ -576,19 +594,30 @@ void show_information(std::vector<Transaction>& transactions){
         }
 
     }
-    std::cout << "| Money balance of your transactions is: \033[33m" << money_balance<< "\033[0m | amount of earns "
-    << earn_counter << " | amount of spends "<< spend_counter << "\n| biggest spend is -\033[31m"
-    << lowest_amount_transaction<<"\033[0m | lowest spend transaction is \033[32m-"<<biggest_amount_transaction << "\033[0m"
-    << "\n| biggest income amount is \033[32m" << biggest_income_tranasction<< "\033[0m | lowest income amount is \033[31m" << lowest_income_transaction << "\033[0m\n";
+
+    //Making stream output fixed to 2 digits after dot.
+    std::ostringstream stream;
+    stream << std::fixed << std::setprecision(2)<< money_balance;
+    balance = stream.str();
+
+    std::cout << "| Money balance of your transactions is: " << color_text(balance, Color::Yellow)<< " | amount of earns "
+    << earn_counter << " | amount of expenses "<< spend_counter << "\n| biggest expense transaction is -"
+    << color_text(std::to_string(lowest_amount_transaction), Color::Red)<<" | lowest expense transaction is -"<<color_text(std::to_string(biggest_amount_transaction), Color::Green)
+    << "\n| biggest income amount is " << color_text(std::to_string(biggest_income_tranasction), Color::Green)<< " | lowest income amount is " << color_text(std::to_string(lowest_income_transaction), Color::Yellow) << "\n";
 }
+    }
     std::cout << "\nPlease enter any button ENTER to continue: ";
     std::cin >> spam;
 }
 
 void show_diapazone(std::vector<Transaction>& transactions){
+    std::string spam;
+    if(transactions.empty() || transactions.size() == 1){
+        std::cout << "There is not enough transactions to set any diapazone :(\n";
+    }
+    else{
     std::string date1;
     std::string date2;
-    std::string spam;
     std::chrono::year_month_day date;
     std::chrono::year_month_day second_date;
     bool first_date_succes = false;
@@ -598,7 +627,7 @@ void show_diapazone(std::vector<Transaction>& transactions){
     do{
     std::cout << "\nPlease enter from which date you want to see transactions: ";
     std::getline(std::cin, date1);
-    if(isDateValid(date1) && date_unparse(date1).ok()){
+    if(isDateValid(date1)){
         date = date_unparse(date1);
         first_date_succes = true;
     }
@@ -610,7 +639,7 @@ void show_diapazone(std::vector<Transaction>& transactions){
     do{
         std::cout << "\nPlease enter to which date you want to see transactions: ";
         std::getline(std::cin, date2);
-        if(isDateValid(date2) && date_unparse(date2).ok()){
+        if(isDateValid(date2)){
             second_date = date_unparse(date2);
             second_date_succes = true;
         }
@@ -629,15 +658,32 @@ void show_diapazone(std::vector<Transaction>& transactions){
         if(block.date > date && block.date < second_date){
             if(block.type == "spend"){
                 std::cout << block.date << "|\t  "<< block.category
-                <<"|\t\033[31m"<<to_upper(block.type)<<"\033[0m|\t"<< block.money_amount << "|\t" << block.description<<"|\n\n"; 
+                <<"|\t" << color_text(to_upper(block.type), Color::Red) <<"|\t"<< block.money_amount << "|\t" << block.description<<"|\n\n"; 
             }
             else{
                 std::cout << block.date << "|\t  "<< block.category
-                <<"|\t\033[32m"<<to_upper(block.type)<<"\033[0m|\t"<< block.money_amount << "|\t" << block.description<<"|\n\n"; 
+                <<"|\t"<<color_text(to_upper(block.type), Color::Green)<<"|\t"<< block.money_amount << "|\t" << block.description<<"|\n\n"; 
             }
         }
     }
-
+    }
     std::cout << "Please enter any button ENTER to continue: ";
     std::cin >> spam;
+}
+
+std::string color_text(std::string x, Color color){
+    std::string text;
+    if(color == Color::Red){
+        text = "\033[32m"+x+"\033[0m";
+        return text;
+    }
+    else if(color == Color::Green){
+        text = "\033[31m"+x+"\033[0m";
+        return text;
+    }
+    else if(color == Color::Yellow){
+        text = "\033[33m"+x+"\033[0m";
+        return text;
+    }
+    return text;
 }
