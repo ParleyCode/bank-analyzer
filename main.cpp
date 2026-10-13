@@ -97,6 +97,7 @@ std::string to_upper(std::string text);
 void find_transactions(std::vector<Transaction>& transactions);
 void show_earning(std::vector<Transaction>& transactions);
 void show_spending(std::vector<Transaction>& transactions);
+void show_diapazone(std::vector<Transaction>& transactions);
 
 
 
@@ -226,7 +227,8 @@ void create_transaction(std::vector<Transaction>& transactions){
     transaction.type = type;
 
     transactions.push_back(transaction);
-    //save_transaction
+
+    save_transactions(transactions);
 }
 
 
@@ -237,7 +239,7 @@ void show_menu(std::vector<Transaction>& transactions){
         std::cout << "\n=-_-=-_-=BANK TRANSACTION LIST=-_-=-_-=\n"<<"1. Create transaction\n"
         <<"2. Show transaction list\n"<<"3. Delete transation\n"<<"4. Change transaction\n"
         <<"5. Find transaction\n"<<"6. Show balance\n"<<"7. Show only income\n"<<"8. Show only spendings\n"
-        <<"9. Save and Quit\n"<<"=-_-=-_-=-_-=-_-=-_-=-_-=-_-=-_-=-_-=-_-=";
+        <<"9. Show transactions in diapazone\n"<<"10. Save and Quit\n"<<"=-_-=-_-=-_-=-_-=-_-=-_-=-_-=-_-=-_-=-_-=";
         std::cout << "\nPlease enter what you want to do: ";
         std::cin >> choise;
 
@@ -272,6 +274,9 @@ void show_menu(std::vector<Transaction>& transactions){
             show_spending(transactions);
         }
         else if(choise == 9){
+            show_diapazone(transactions);
+        }
+        else if(choise == 10){
             save_transactions(transactions);
             exit(0);
         }
@@ -556,5 +561,62 @@ void show_balance(std::vector<Transaction>& transactions){
     << earn_counter << " | amount of spends "<< spend_counter;
 }
     std::cout << "\nPlease enter any button ENTER to continue: ";
+    std::cin >> spam;
+}
+
+void show_diapazone(std::vector<Transaction>& transactions){
+    std::string date1;
+    std::string date2;
+    std::string spam;
+    std::chrono::year_month_day date;
+    std::chrono::year_month_day second_date;
+    bool first_date_succes = false;
+    bool second_date_succes = false;
+
+    std::cin.clear();std::cin.ignore(10000, '\n');
+    do{
+    std::cout << "\nPlease enter from which date you want to see transactions: ";
+    std::getline(std::cin, date1);
+    if(isDateValid(date1) && date_unparse(date1).ok()){
+        date = date_unparse(date1);
+        first_date_succes = true;
+    }
+    else{
+        std::cout << "\nWrond input, input date in form YYYY-MM-DD";
+    }
+    }while(first_date_succes == false);
+
+    do{
+        std::cout << "\nPlease enter to which date you want to see transactions: ";
+        std::getline(std::cin, date2);
+        if(isDateValid(date2) && date_unparse(date2).ok()){
+            second_date = date_unparse(date2);
+            second_date_succes = true;
+        }
+        else{
+            std::cout << "\nWrong input, input date in form YYYY-MM-DD";
+        }
+    }while(second_date_succes == false);
+
+    std::sort(transactions.begin(), transactions.end(),
+    [](const Transaction& a, const Transaction& b) {
+        return a.date > b.date;
+    }
+    );
+
+    for(const auto& block : transactions){
+        if(block.date > date && block.date < second_date){
+            if(block.type == "spend"){
+                std::cout << block.date << "|\t  "<< block.category
+                <<"|\t\033[31m"<<to_upper(block.type)<<"\033[0m|\t"<< block.money_amount << "|\t" << block.description<<"|\n\n"; 
+            }
+            else{
+                std::cout << block.date << "|\t  "<< block.category
+                <<"|\t\033[32m"<<to_upper(block.type)<<"\033[0m|\t"<< block.money_amount << "|\t" << block.description<<"|\n\n"; 
+            }
+        }
+    }
+
+    std::cout << "Please enter any button ENTER to continue: ";
     std::cin >> spam;
 }
