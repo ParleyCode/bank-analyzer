@@ -35,7 +35,7 @@ enum class Color{
 };
 
 class Transaction{
-    public:
+
     std::string type = "";
     std::string category = "";
     double money_amount = 0;
@@ -43,36 +43,92 @@ class Transaction{
     std::string str_date = "";
 
     std::chrono::year_month_day date;
+
+    public:
+
+    //Setters
+    void setType(std::string type_str){
+        type = type_str;
+    }
+
+    void setDescription(std::string newDescription){
+        description = newDescription;
+    }
+
+    void setMoneyAmount(int newMoney){
+        money_amount = newMoney;
+    }
+
+    void setCategory(std::string newCategory){
+        category = newCategory;
+    }
+
+    void setDate(std::string strTypeDate){
+        str_date = strTypeDate;
+        date = date_unparse(strTypeDate);
+    }
+
+
+    //Getters
+    std::chrono::year_month_day getChronoDate()const{
+        return date;
+    }
+
+    double getMoneyAmount()const {
+        return money_amount;
+    }
+
+    std::string getCategory() const{
+        return category;
+    }
+
+    std::string getDescription() const{
+        return description;
+    }
+
+    std::string getType()const{
+        return type;
+    }
+
+    std::string getStrDate()const{
+        return str_date;
+    }
 };
 
 //Function that checks is date valid or not
 bool isDateValid(std::string date){
+    if(date.length()== 10){
 
-    std::string day_part, month_part, year_part;
+    
+        std::string day_part, month_part, year_part;
 
-    std::stringstream str(date);
+        std::stringstream str(date);
 
-    std::getline(str, year_part, '-');
-    std::getline(str, month_part, '-');
-    std::getline(str, day_part, '-');
+        std::getline(str, year_part, '-');
+        std::getline(str, month_part, '-');
+        std::getline(str, day_part, '-');
 
-    try {
-    int day = std::stoi(day_part);
-    int month = std::stoi(month_part);
-    int year = std::stoi(year_part);
-}
-catch (const std::invalid_argument&) {
-    return false;
-}
-catch (const std::out_of_range&) {
-    return false;
-}
-if(date_unparse(date).ok()){
-    return true;
-}
-else{
-    return false;
-}
+        try {
+        int day = std::stoi(day_part);
+        int month = std::stoi(month_part);
+        int year = std::stoi(year_part);
+    }
+    catch (const std::invalid_argument&) {
+        return false;
+    }
+    catch (const std::out_of_range&) {
+        return false;
+    }
+    if(date_unparse(date).ok()){
+        return true;
+    }
+    else{
+        return false;
+    }
+    }
+    else{
+        return false;
+    }
 }
 
 //Function to unparse string date to chrono value date
@@ -155,12 +211,11 @@ void load_transactions(std::vector<Transaction>& transactions){
         if(money_amount == 0.0){
             continue;
         }
-        transaction.category = category;
-        transaction.str_date = date;
-        transaction.date = date_unparse(date);
-        transaction.description = description;
-        transaction.type = type;
-        transaction.money_amount = money_amount;
+        transaction.setCategory(category);
+        transaction.setDate(date);
+        transaction.setDescription(description);
+        transaction.setType(type);
+        transaction.setMoneyAmount(money_amount);
 
         transactions.push_back(transaction);
     }
@@ -171,13 +226,26 @@ void save_transactions(std::vector<Transaction>& transactions){
     Transaction transction;
     std::ofstream fout;
 
+    std::string type;
+    std::string date;
+    std::string description;
+    std::string category;
+    int money_amount;
+
     fout.open("transactions.txt");
-    for(const auto& block : transactions){
-        fout << block.type<<"\n";
-        fout << block.category<<"\n";
-        fout << block.date<<"\n";
-        fout << block.description<<"\n";
-        fout << block.money_amount<<"\n";
+    for(auto& block : transactions){
+        type = block.getType();
+        category = block.getCategory();
+        date = block.getStrDate();
+        description = block.getDescription();
+        money_amount = block.getMoneyAmount();
+
+        fout << type<<"\n";
+        fout << category<<"\n";
+        fout << date<<"\n";
+        fout << description<<"\n";
+        fout << money_amount<<"\n";
+
     }
 }
 
@@ -195,7 +263,7 @@ void create_transaction(std::vector<Transaction>& transactions){
 
     std::cin.clear();std::cin.ignore(10000, '\n');
     do{
-        std::cout << "\nPlease enter date of the transaction: ";
+        std::cout << "\nPlease enter date of the transaction (YYYY-MM-DD): ";
         std::getline(std::cin, date);
         if(isDateValid(date) == true){
             date_succes = true;
@@ -232,12 +300,11 @@ void create_transaction(std::vector<Transaction>& transactions){
     std::cin.clear(); std::cin.ignore(10000, '\n');
     std::getline(std::cin, description);
 
-    transaction.category = category;
-    transaction.str_date = date;
-    transaction.date = date_unparse(date);
-    transaction.description = description;
-    transaction.money_amount = money_amount;
-    transaction.type = type;
+    transaction.setCategory(category);
+    transaction.setDate(date);
+    transaction.setDescription(description);
+    transaction.setMoneyAmount(money_amount);
+    transaction.setType(type);
 
     transactions.push_back(transaction);
 
@@ -303,15 +370,15 @@ void list_transactions(std::vector<Transaction>& transactions){
     int counter = 0;
     std::string spam;
     if(!(transactions.empty())){
-        for(const auto& block : transactions){
+        for(auto& block : transactions){
             ++counter;
-            if(block.type == "spend"){
-            std::cout << counter << ".|\t\t" << block.date<< "|\t\t"<< block.category
-            <<"|\t\t"<<color_text(to_upper(block.type), Color::Red)<<"|\t\t"<< block.money_amount << "|\t\t" << block.description<<"|\n"; 
+            if(block.getType() == "spend"){
+            std::cout << counter << ".|\t\t" << block.getChronoDate() << "|\t\t"<< block.getCategory()
+            <<"|\t\t"<<color_text(to_upper(block.getType()), Color::Red)<<"|\t\t"<< block.getMoneyAmount() << "|\t\t" << block.getDescription() <<"|\n"; 
         }
         else{
-            std::cout << counter << ".|\t\t" << block.date<< "|\t\t"<< block.category
-            <<"|\t\t"<<color_text(to_upper(block.type), Color::Green)<<"|\t\t"<< block.money_amount << "|\t\t" << block.description<<"|\n"; 
+            std::cout << counter << ".|\t\t" << block.getChronoDate() << "|\t\t"<< block.getCategory()
+            <<"|\t\t"<<color_text(to_upper(block.getType()), Color::Green)<<"|\t\t"<< block.getMoneyAmount() << "|\t\t" << block.getDescription() <<"|\n"; 
         }
         }
     }
@@ -384,7 +451,7 @@ void change_transaction(std::vector<Transaction>& transactions){
             std::cin.clear();std::cin.ignore(10000, '\n');
             //Cheking is date valid
             do{
-                std::cout << "\nPlease enter new date of the transaction: ";
+                std::cout << "\nPlease enter new date of the transaction (YYYY-MM-DD): ";
                 std::getline(std::cin, date);
                 if(isDateValid(date) == true){
                     date_succes = true;
@@ -423,12 +490,11 @@ void change_transaction(std::vector<Transaction>& transactions){
             std::cout << "Please enter new description of the transaction: ";
             std::getline(std::cin, description);
 
-            transactions[choise - 1].str_date = date;
-            transactions[choise - 1].date = date_unparse(date);
-            transactions[choise - 1].category = category;
-            transactions[choise - 1].type = type;
-            transactions[choise - 1].money_amount = money_amount;
-            transactions[choise - 1].description = description;
+            transactions[choise - 1].setDate(date);
+            transactions[choise - 1].setCategory(category);
+            transactions[choise - 1].setType(type);
+            transactions[choise - 1].setMoneyAmount(money_amount);
+            transactions[choise - 1].setDescription(description);
             succes = true;
             save_transactions(transactions);
         }
@@ -460,37 +526,37 @@ void find_transactions(std::vector<Transaction>& transactions){
         std::cout << "Please enter which transactions you want to find: ";
         std::getline(std::cin, finding_word);
         finding_word = to_upper(finding_word);
-        for (const auto& block : transactions){
-        if(to_upper(block.description).find(finding_word) != std::string::npos){
-            if(block.type == "spend"){
-                std::cout << block.date << "|\t  "<< block.category
-                <<"|\t\t"<<color_text(to_upper(block.type), Color::Red)<<"|\t\t"<< block.money_amount << "|\t\t" << block.description<<"|\n"; 
+        for (auto& block : transactions){
+        if(to_upper(block.getDescription()).find(finding_word) != std::string::npos){
+            if(block.getType() == "spend"){
+                std::cout << block.getChronoDate() << "|\t  "<< block.getCategory()
+                <<"|\t\t"<<color_text(to_upper(block.getType()), Color::Red)<<"|\t\t"<< block.getMoneyAmount() << "|\t\t" << block.getDescription() <<"|\n"; 
             }
             else{
-                std::cout << block.date << "|\t"<< block.category
-                <<"|\t\t"<<color_text(to_upper(block.type), Color::Green)<<"|\t\t"<< block.money_amount << "|\t\t" << block.description<<"|\n"; 
+                std::cout << block.getChronoDate() << "|\t"<< block.getCategory()
+                <<"|\t\t"<<color_text(to_upper(block.getType()), Color::Green)<<"|\t\t"<< block.getMoneyAmount() << "|\t\t" << block.getDescription()<<"|\n"; 
             }
         }
 
-        else if(to_upper(block.str_date).find(finding_word) != std::string::npos){
-            if(block.type == "spend"){
-                std::cout << block.date << "|\t  "<< block.category
-                <<"|\t"<<color_text(to_upper(block.type), Color::Red)<<"|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
+        else if(to_upper(block.getStrDate()).find(finding_word) != std::string::npos){
+            if(block.getType() == "spend"){
+                std::cout << block.getChronoDate() << "|\t  "<< block.getCategory()
+                <<"|\t"<<color_text(to_upper(block.getType()), Color::Red)<<"|\t"<< block.getMoneyAmount() << "|\t" << block.getDescription()<<"|\n"; 
             }
             else{
-                std::cout << block.date << "|\t  "<< block.category
-                <<"|\t"<<color_text(to_upper(block.type), Color::Green)<<"|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
+                std::cout << block.getChronoDate() << "|\t  "<< block.getCategory()
+                <<"|\t"<<color_text(to_upper(block.getType()), Color::Green)<<"|\t"<< block.getMoneyAmount() << "|\t" << block.getDescription() <<"|\n"; 
             }
         }
         
-        else if(to_upper(block.category).find(finding_word) != std::string::npos){
-            if(block.type == "spend"){
-                std::cout << block.date << "|\t"<< block.category
-                <<"|\t"<<color_text(to_upper(block.type), Color::Red)<<"|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
+        else if(to_upper(block.getCategory()).find(finding_word) != std::string::npos){
+            if(block.getType() == "spend"){
+                std::cout << block.getChronoDate() << "|\t"<< block.getCategory()
+                <<"|\t"<<color_text(to_upper(block.getType()), Color::Red)<<"|\t"<< block.getMoneyAmount() << "|\t" << block.getDescription() <<"|\n"; 
             }
             else{
-                std::cout << block.date << "|\t  "<< block.category
-                <<"|\t"<<color_text(to_upper(block.type), Color::Green)<<"|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
+                std::cout << block.getChronoDate() << "|\t  "<< block.getCategory()
+                <<"|\t"<<color_text(to_upper(block.getType()), Color::Green)<<"|\t"<< block.getMoneyAmount() << "|\t" << block.getDescription() <<"|\n"; 
             }
         }
 
@@ -508,11 +574,11 @@ void show_earning(std::vector<Transaction>& transactions){
         std::cout << "There is no transactions to search from :(\n";
     }
     else{
-    for(const auto& block : transactions){
-        if(block.type == "earn"){
+    for(auto& block : transactions){
+        if(block.getType() == "earn"){
             ++counter;
-            std::cout << block.date << "|\t  "<< block.category
-            <<"|\t"<<color_text(to_upper(block.type), Color::Green)<<"|\t"<< block.money_amount << "|\t" << block.description<<"|\n"; 
+            std::cout << block.getChronoDate() << "|\t  "<< block.getCategory()
+            <<"|\t"<<color_text(to_upper(block.getType()), Color::Green)<<"|\t"<< block.getMoneyAmount() << "|\t" << block.getDescription() <<"|\n"; 
         }
     }
     if(counter == 0){
@@ -533,11 +599,11 @@ void show_spending(std::vector<Transaction>& transactions){
         std::cout << "There is no transactions to search from :(\n";
     }
     else{
-    for(const auto& block : transactions){
-        if(block.type == "spend"){
+    for(auto& block : transactions){
+        if(block.getType() == "spend"){
             ++counter;
-            std::cout << block.date << "|\t  "<< block.category
-            <<"|\t\t"<<color_text(to_upper(block.type), Color::Red)<<"|\t\t"<< block.money_amount << "|\t\t" << block.description<<"|\n"; 
+            std::cout << block.getChronoDate() << "|\t  "<< block.getCategory()
+            <<"|\t\t"<<color_text(to_upper(block.getType()), Color::Red)<<"|\t\t"<< block.getMoneyAmount() << "|\t\t" << block.getDescription() <<"|\n"; 
         }
     }
     if(counter == 0){
@@ -565,11 +631,13 @@ void show_information(std::vector<Transaction>& transactions){
     double money_balance = 0;
     int earn_counter = 0;
     int spend_counter = 0;
-    double biggest_amount_transaction = transactions[0].money_amount;
-    double lowest_amount_transaction = transactions[0].money_amount;
+    double biggest_amount_transaction;
+    double lowest_amount_transaction;
 
-    double biggest_income_transaction = transactions[0].money_amount;
-    double lowest_income_transaction = transactions[0].money_amount;
+    double biggest_income_transaction = transactions[0].getMoneyAmount();
+    double lowest_income_transaction = transactions[0].getMoneyAmount();
+    double currentTransaction = 0;
+    int iterationCounter = 0;
 
     std::string balance;
 
@@ -579,25 +647,33 @@ void show_information(std::vector<Transaction>& transactions){
     }
 
     else{
-    for(const auto& block : transactions){
-        if(block.type == "earn"){
-            money_balance += block.money_amount;
+    for(auto& block : transactions){
+        currentTransaction = block.getMoneyAmount();
+
+        if(block.getType() == "earn"){
+            money_balance += currentTransaction;
             ++earn_counter;
-            if(lowest_income_transaction >= block.money_amount){
-                lowest_income_transaction = block.money_amount;
+            if(lowest_income_transaction >= block.getMoneyAmount()){
+                lowest_income_transaction = block.getMoneyAmount();
             }
-            else if(biggest_income_transaction <= block.money_amount){
-                biggest_income_transaction = block.money_amount;
+            else if(biggest_income_transaction <= block.getMoneyAmount()){
+                biggest_income_transaction = block.getMoneyAmount();
             }
         }
-        else{
-            money_balance -= block.money_amount;
-            ++spend_counter;
-            if(-1 * lowest_amount_transaction >= -1 * (block.money_amount)){
-                lowest_amount_transaction = block.money_amount;
+        else{        
+            currentTransaction *= -1;
+            if(iterationCounter == 0){
+                lowest_amount_transaction = currentTransaction;
+                biggest_amount_transaction = currentTransaction;
+                ++iterationCounter;
             }
-            else if(-1 * biggest_amount_transaction <= -1 * block.money_amount){
-                biggest_amount_transaction = block.money_amount;
+            money_balance += currentTransaction;
+            ++spend_counter;
+            if(currentTransaction >= lowest_amount_transaction){
+                lowest_amount_transaction = currentTransaction;
+            }
+            else if(currentTransaction < biggest_amount_transaction){
+                biggest_amount_transaction = currentTransaction;
             }
         }
 
@@ -609,8 +685,8 @@ void show_information(std::vector<Transaction>& transactions){
     balance = stream.str();
 
     std::cout << "| Money balance of your transactions is: " << color_text(balance, Color::Yellow)<< " | amount of earns "
-    << earn_counter << " | amount of expenses "<< spend_counter << "\n| biggest expense transaction is -"
-    << color_text(std::to_string(lowest_amount_transaction), Color::Red)<<" | lowest expense transaction is -"<<color_text(std::to_string(biggest_amount_transaction), Color::Green)
+    << earn_counter << " | amount of expenses "<< spend_counter << "\n| biggest expense transaction is "
+    << color_text(std::to_string(biggest_amount_transaction), Color::Red)<<" | lowest expense transaction is "<<color_text(std::to_string(lowest_amount_transaction), Color::Green)
     << "\n| biggest income amount is " << color_text(std::to_string(biggest_income_transaction), Color::Green)<< " | lowest income amount is " << color_text(std::to_string(lowest_income_transaction), Color::Yellow) << "\n";
 }
     }
@@ -658,20 +734,20 @@ void show_diapazone(std::vector<Transaction>& transactions){
     }while(second_date_succes == false);
 
     std::sort(transactions.begin(), transactions.end(),
-    [](const Transaction& a, const Transaction& b) {
-        return a.date > b.date;
+    [](Transaction& a, Transaction& b) {
+        return a.getStrDate() > b.getStrDate();
     }
     );
 
-    for(const auto& block : transactions){
-        if(block.date > date && block.date < second_date){
-            if(block.type == "spend"){
-                std::cout << block.date << "|\t  "<< block.category
-                <<"|\t" << color_text(to_upper(block.type), Color::Red) <<"|\t"<< block.money_amount << "|\t" << block.description<<"|\n\n"; 
+    for(auto& block : transactions){
+        if(block.getChronoDate() > date && block.getChronoDate() < second_date){
+            if(block.getType()== "spend"){
+                std::cout << block.getChronoDate() << "|\t  "<< block.getCategory()
+                <<"|\t" << color_text(to_upper(block.getType()), Color::Red) <<"|\t"<< block.getMoneyAmount() << "|\t" << block.getDescription()<<"|\n\n"; 
             }
             else{
-                std::cout << block.date << "|\t  "<< block.category
-                <<"|\t"<<color_text(to_upper(block.type), Color::Green)<<"|\t"<< block.money_amount << "|\t" << block.description<<"|\n\n"; 
+                std::cout << block.getChronoDate() << "|\t  "<< block.getCategory()
+                <<"|\t"<<color_text(to_upper(block.getType()), Color::Green)<<"|\t"<< block.getMoneyAmount() << "|\t" << block.getDescription()<<"|\n\n"; 
             }
         }
     }
