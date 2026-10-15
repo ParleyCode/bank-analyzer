@@ -45,6 +45,7 @@ class Transaction{
     std::chrono::year_month_day date;
 };
 
+//Function that checks is date valid or not
 bool isDateValid(std::string date){
 
     std::string day_part, month_part, year_part;
@@ -74,6 +75,7 @@ else{
 }
 }
 
+//Function to unparse string date to chrono value date
 std::chrono::year_month_day date_unparse(std::string date){
     int year, month, day;
     std::string part, part1, part2;
@@ -180,7 +182,7 @@ void save_transactions(std::vector<Transaction>& transactions){
 }
 
 
-//Function to save transactions to the file
+//Function to create transactions 
 void create_transaction(std::vector<Transaction>& transactions){
     Transaction transaction;
     bool date_succes = false;
@@ -295,7 +297,7 @@ void show_menu(std::vector<Transaction>& transactions){
         }
     }
 }
-
+//Functions to show the list of the existing transactions
 void list_transactions(std::vector<Transaction>& transactions){
     Transaction transaction;
     int counter = 0;
@@ -320,6 +322,7 @@ void list_transactions(std::vector<Transaction>& transactions){
     std::cin >> spam;
 }
 
+//Function to delete transaction
 void delete_transaction(std::vector<Transaction>& transactions){
     int choise = 0;
     bool succes = false;
@@ -348,6 +351,7 @@ void delete_transaction(std::vector<Transaction>& transactions){
     }
 }
 
+//Function that allows change selected transaction
 void change_transaction(std::vector<Transaction>& transactions){
     list_transactions(transactions);
 
@@ -433,6 +437,7 @@ void change_transaction(std::vector<Transaction>& transactions){
 }
 }
 
+//Function to set selected text to upper register
 std::string to_upper(std::string text){
     std::transform(text.begin(), text.end(), text.begin(),
         [](unsigned char c) {
@@ -442,6 +447,7 @@ std::string to_upper(std::string text){
     return text;
 }
 
+//Function that allows to find transaction by tags
 void find_transactions(std::vector<Transaction>& transactions){
     std::string finding_word;
     std::string spam;
@@ -494,6 +500,7 @@ void find_transactions(std::vector<Transaction>& transactions){
     std::cin >> spam;
 }
 
+//Function that shows only income transactions
 void show_earning(std::vector<Transaction>& transactions){
     std::string spam;
     int counter = 0;
@@ -517,6 +524,7 @@ void show_earning(std::vector<Transaction>& transactions){
     
 }
 
+//Function that show only expense transactions
 void show_spending(std::vector<Transaction>& transactions){
     std::string spam;
     int counter = 0;
@@ -542,7 +550,8 @@ void show_spending(std::vector<Transaction>& transactions){
 
 /*
 
-    Function read all transactions and adds it all to suma, if spend -suma if earn +suma
+    Function that shows information about: current balance, amount of income/expense transactions
+    biggest/lowest income/expense transaction
 
 */
 void show_information(std::vector<Transaction>& transactions){
@@ -609,6 +618,7 @@ void show_information(std::vector<Transaction>& transactions){
     std::cin >> spam;
 }
 
+//Function that allows to show transactions in selected date diapazone
 void show_diapazone(std::vector<Transaction>& transactions){
     std::string spam;
     if(transactions.empty() || transactions.size() == 1){
@@ -670,6 +680,7 @@ void show_diapazone(std::vector<Transaction>& transactions){
     std::cin >> spam;
 }
 
+//Function that allows to color selected text
 std::string color_text(std::string x, Color color){
     std::string text;
     if(color == Color::Red){
